@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.dao.BlogDao">
+
+    <resultMap id="blogMap" type="com.app.bean.Blog">
+        <id property="id" column="blog_id" />
+        <result property="title" column="title"/>
+        <result property="author" column="author"/>
+        <result property="publishDate" column="publish_date"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="content" column="content"/>
+        <association property="user" javaType="com.sys.bean.User">
+            <id property="id" column="user_id"/>
+            <result property="username" column="username"/>
+        </association>
+    </resultMap>
+    <select id="findList" resultMap="blogMap">
+select
+        b.id blog_id,
+        b.title,
+        b.content,
+        b.author,
+        b.publish_date,
+        b.user_id,
+        b.update_time,
+        u.username
+        from blog b left join blog_user u on u.id = b.user_id
+<where>
+    b.del_flag!='1'
+    <if test="author!=null and author!=''">
+        and b.author=#{author}
+    </if>
+    <if test="publishDate!=null">
+        and b.publish_date=#{publishDate}
+    </if>
+</where>
+        order by b.update_time DESC
+    </select>
+
+    <insert id = "insert">
+     insert into blog(title,author,content,publish_date,del_flag)
+     values(#{title},#{author},#{content},#{publishDate},0);
+   </insert>
+
+     <select id="findByTitle" resultType="com.app.bean.Blog">
+         select b.title,b.author,b.content,b.publish_date publishDate
+         from blog b
+         where b.title=#{title};
+     </select>
+
+
+
+
+
+
+    <select id="findAll" resultMap="blogMap">
+        select * from blog
+    </select>
+
+
+
+</mapper>
